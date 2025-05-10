@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Physolve - Physics Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label, input, select { display: block; margin: 10px 0; }
+    #inputs div { margin-bottom: 8px; }
+    #result { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Physolve - Select a Physics Formula</h1>
+
+  <label for="formula">Choose a formula:</label>
+  <select id="formula">
+    <option value="">-- Select --</option>
+    <option value="average_speed">Average Speed (S = d/t)</option>
+    <option value="acceleration">Acceleration (a = (v-u)/t)</option>
+    <option value="density">Density (ρ = m/V)</option>
+    <option value="power">Power (P = W/t)</option>
+    <option value="newtons_2nd">Newton’s Second Law (F = ma)</option>
+    <option value="weight">Weight (W = mg)</option>
+    <option value="pressure">Pressure (P = F/A)</option>
+    <option value="ohms_law">Ohm’s Law (V = IR)</option>
+    <option value="kinetic_energy">Kinetic Energy (E = ½mv²)</option>
+    <option value="pendulum">Pendulum (T = 2π√L/g)</option>
+    <!-- Add more options as needed -->
+  </select>
+
+  <form id="physicsForm">
+    <div id="inputs"></div>
+    <button type="submit">Calculate</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const formulas = {
+      average_speed: ['d', 't'],
+      acceleration: ['v', 'u', 't'],
+      density: ['m', 'V'],
+      power: ['W', 't'],
+      newtons_2nd: ['m', 'a'],
+      weight: ['m', 'g'],
+      pressure: ['F', 'A'],
+      ohms_law: ['I', 'R'],
+      kinetic_energy: ['m', 'v'],
+      pendulum: ['L', 'g'],
+      // Add more inputs here
+    };
+
+    const inputLabels = {
+      d: 'Distance (d)',
+      t: 'Time (t)',
+      v: 'Final Velocity (v)',
+      u: 'Initial Velocity (u)',
+      m: 'Mass (m)',
+      V: 'Volume (V)',
+      W: 'Work (W)',
+      a: 'Acceleration (a)',
+      g: 'Gravity (g)',
+      F: 'Force (F)',
+      A: 'Area (A)',
+      I: 'Current (I)',
+      R: 'Resistance (R)',
+      L: 'Length (L)'
+    };
+
+    document.getElementById('formula').addEventListener('change', function() {
+      const selected = this.value;
+      const inputsDiv = document.getElementById('inputs');
+      inputsDiv.innerHTML = '';
+
+      if (formulas[selected]) {
+        formulas[selected].forEach(id => {
+          const label = document.createElement('label');
+          label.innerText = inputLabels[id] || id;
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.id = id;
+          input.required = true;
+          inputsDiv.appendChild(label);
+          inputsDiv.appendChild(input);
+        });
+      }
+    });
+
+    document.getElementById('physicsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formula = document.getElementById('formula').value;
+      if (!formula) return alert("Select a formula");
+
+      const inputs = {};
+      formulas[formula].forEach(id => {
+        inputs[id] = document.getElementById(id).value;
+      });
+
+      const res = await fetch('/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formula, inputs })
+      });
+
+      const data = await res.json();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (data.error) {
+        resultDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+      } else {
+        for (let key in data) {
+          resultDiv.innerHTML += `<p>${key}: ${parseFloat(data[key]).toFixed(2)}</p>`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
