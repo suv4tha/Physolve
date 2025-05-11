@@ -59,6 +59,6 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="violet")) as app:
     selected_formula.change(fn=update_inputs, inputs=[selected_formula], outputs=input_components)
     calculate_btn.click(fn=calculate, inputs=[selected_formula] + input_components, outputs=[output])
 
-app.launch()
+# Bind to 0.0.0.0 for Render deployment
 if __name__ == "__main__":
     app.launch(server_name="0.0.0.0", server_port=8080)
