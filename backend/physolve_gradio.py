@@ -1,6 +1,6 @@
 import gradio as gr
 import math
-import os
+
 # Define formulas and their required inputs
 formulas = {
     "Average Speed (S = d/t)": (["d", "t"], lambda d, t: d / t),
@@ -58,5 +58,5 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="violet")) as app:
     # Events
     selected_formula.change(fn=update_inputs, inputs=[selected_formula], outputs=input_components)
     calculate_btn.click(fn=calculate, inputs=[selected_formula] + input_components, outputs=[output])
-app.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
+
 app.launch()
